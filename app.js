@@ -17,7 +17,11 @@ const oAuth2Client = new OAuth2(client_id, client_secret, redirectUri);
 app.get('/auth', (req, res) => {
     const authUrl = oAuth2Client.generateAuthUrl({
         access_type: 'offline',
-        scope: ['https://www.googleapis.com/auth/analytics.readonly'],
+        scope: [
+            'https://www.googleapis.com/auth/analytics.readonly',
+            'https://www.googleapis.com/auth/analytics.manage.users.readonly',
+            'https://www.googleapis.com/auth/analytics.edit',
+        ],
     });
     res.redirect(authUrl);
 });
@@ -31,12 +35,13 @@ app.get('/oauth2callback', async (req, res) => {
         console.log('Tokens received:', tokens);
         oAuth2Client.setCredentials(tokens);
 
-        // Fetch the Analytics account details using the v1beta API
-        const analyticsAdmin = google.analyticsadmin('v1beta');
-
-        const response = await analyticsAdmin.accountSummaries.list({
+        // Fetch the Analytics account details using the Admin API v1beta
+        const analyticsAdmin = google.analyticsadmin({
+            version: 'v1beta',
             auth: oAuth2Client,
         });
+
+        const response = await analyticsAdmin.accountSummaries.list();
         console.log('Account summaries response:', response.data);
 
         const accounts = response.data.accountSummaries;
