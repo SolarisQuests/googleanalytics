@@ -1,0 +1,13 @@
+{
+  "name": "google-analytics-connector",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "google-auth-library": "^7.0.2",
+    "googleapis": "^92.0.0"
+  }
+}
