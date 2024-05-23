@@ -8,6 +8,8 @@ const port = process.env.PORT || 3000;
 // Load OAuth2 credentials from environment variable
 const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
 const { client_id, client_secret, redirect_uris } = credentials.web;
+
+// Use the Render URL as the redirect URI
 const oAuth2Client = new OAuth2(client_id, client_secret, redirect_uris[0]);
 
 // Generate the URL for Google authentication
@@ -38,6 +40,7 @@ app.get('/oauth2callback', async (req, res) => {
             return;
         }
 
+        // Extract the first property's ID (you might want to handle multiple properties)
         const propertyId = accounts[0].webProperties[0].id;
         res.send(`Google Analytics connected successfully. Property ID: ${propertyId}`);
     } catch (error) {
