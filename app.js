@@ -29,10 +29,12 @@ app.get('/oauth2callback', async (req, res) => {
         oAuth2Client.setCredentials(tokens);
 
         // Fetch the Analytics account details using the v4 API
-        const analyticsAdmin = google.analyticsadmin('v1beta');
-        const response = await analyticsAdmin.accountSummaries.list({
+        const analyticsAdmin = google.analyticsadmin({
+            version: 'v1beta',
             auth: oAuth2Client,
         });
+
+        const response = await analyticsAdmin.accountSummaries.list();
 
         const accounts = response.data.accountSummaries;
         if (!accounts || accounts.length === 0) {
