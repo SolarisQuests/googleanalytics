@@ -26,7 +26,9 @@ app.get('/auth', (req, res) => {
 app.get('/oauth2callback', async (req, res) => {
     const code = req.query.code;
     try {
+        console.log('Authorization code received:', code);
         const { tokens } = await oAuth2Client.getToken(code);
+        console.log('Tokens received:', tokens);
         oAuth2Client.setCredentials(tokens);
 
         // Fetch the Analytics account details using the v4 API
@@ -36,6 +38,7 @@ app.get('/oauth2callback', async (req, res) => {
         });
 
         const response = await analyticsAdmin.accountSummaries.list();
+        console.log('Account summaries response:', response);
 
         const accounts = response.data.accountSummaries;
         if (!accounts || accounts.length === 0) {
@@ -43,12 +46,29 @@ app.get('/oauth2callback', async (req, res) => {
             return;
         }
 
-        // Extract the first property's ID (you might want to handle multiple properties)
-        const propertyId = accounts[0].propertySummaries[0].property;
-        res.send(`Google Analytics connected successfully. Property ID: ${propertyId}`);
+        // Extract and log all properties
+        let properties = [];
+        accounts.forEach(account => {
+            if (account.propertySummaries) {
+                account.propertySummaries.forEach(property => {
+                    properties.push(property);
+                });
+            }
+        });
+
+        console.log('Properties found:', properties);
+
+        // Display all properties to the user
+        let responseHtml = '<h1>Google Analytics Properties</h1><ul>';
+        properties.forEach(property => {
+            responseHtml += `<li>Property ID: ${property.property}, Display Name: ${property.displayName}</li>`;
+        });
+        responseHtml += '</ul>';
+        res.send(responseHtml);
+
     } catch (error) {
-        console.error('Error during authentication', error);
-        res.status(500).send('Authentication failed.');
+        console.error('Error during authentication:', error);
+        res.status(500).send('Authentication failed. Error: ' + error.message);
     }
 });
 
