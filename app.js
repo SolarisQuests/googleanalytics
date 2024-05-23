@@ -28,20 +28,20 @@ app.get('/oauth2callback', async (req, res) => {
         const { tokens } = await oAuth2Client.getToken(code);
         oAuth2Client.setCredentials(tokens);
 
-        // Fetch the Analytics account details
-        const analytics = google.analytics('v3');
-        const response = await analytics.management.accountSummaries.list({
+        // Fetch the Analytics account details using the v4 API
+        const analyticsAdmin = google.analyticsadmin('v1beta');
+        const response = await analyticsAdmin.accountSummaries.list({
             auth: oAuth2Client,
         });
 
-        const accounts = response.data.items;
-        if (accounts.length === 0) {
+        const accounts = response.data.accountSummaries;
+        if (!accounts || accounts.length === 0) {
             res.send('No Google Analytics accounts found.');
             return;
         }
 
         // Extract the first property's ID (you might want to handle multiple properties)
-        const propertyId = accounts[0].webProperties[0].id;
+        const propertyId = accounts[0].propertySummaries[0].property;
         res.send(`Google Analytics connected successfully. Property ID: ${propertyId}`);
     } catch (error) {
         console.error('Error during authentication', error);
