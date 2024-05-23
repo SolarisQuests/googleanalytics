@@ -10,7 +10,8 @@ const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
 const { client_id, client_secret, redirect_uris } = credentials.web;
 
 // Use the Render URL as the redirect URI
-const oAuth2Client = new OAuth2(client_id, client_secret, redirect_uris[0]);
+const redirectUri = redirect_uris[0]; // Ensure this matches the authorized redirect URI in Google Cloud Console
+const oAuth2Client = new OAuth2(client_id, client_secret, redirectUri);
 
 // Generate the URL for Google authentication
 app.get('/auth', (req, res) => {
